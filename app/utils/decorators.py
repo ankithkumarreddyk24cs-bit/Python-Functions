@@ -40,3 +40,27 @@ def require_json(f):
         return f(*args, **kwargs)
     
     return decorated_function
+
+
+def validate_request_data(schema):
+    """
+    Decorator to validate request data against a Marshmallow schema
+    
+    Args:
+        schema: Marshmallow schema for validation
+    
+    Returns:
+        Decorated function
+    """
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            data = request.get_json()
+            errors = schema.validate(data)
+            if errors:
+                return {'success': False, 'errors': errors}, 400
+            return f(*args, **kwargs)
+        
+        return decorated_function
+    
+    return decorator
